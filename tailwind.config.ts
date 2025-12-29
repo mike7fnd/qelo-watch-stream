@@ -17,8 +17,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['Inter', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'],
+        body: ['San Francisco', 'sans-serif'],
+        headline: ['San Francisco', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {

@@ -100,3 +100,20 @@ export interface Credits {
   cast: CastMember[];
   crew: any[]; // Not focusing on crew for now
 }
+
+export interface MediaImage {
+    aspect_ratio: number;
+    height: number;
+    iso_639_1: string | null;
+    file_path: string;
+    vote_average: number;
+    vote_count: number;
+    width: number;
+}
+
+export interface MediaImageResponse {
+    backdrops: MediaImage[];
+    id: number;
+    logos: MediaImage[];
+    posters: MediaImage[];
+}

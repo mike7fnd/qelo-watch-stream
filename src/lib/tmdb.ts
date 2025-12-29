@@ -1,4 +1,4 @@
-import type { Movie, MovieDetails, PaginatedResponse, TVShow, TVShowDetails, Video, SeasonDetails, Credits } from '@/lib/types';
+import type { Movie, MovieDetails, PaginatedResponse, TVShow, TVShowDetails, Video, SeasonDetails, Credits, MediaImageResponse } from '@/lib/types';
 
 const API_KEY = '9de9190cc0054e4675cbd4571c5ec33a';
 const API_BASE_URL = 'https://api.themoviedb.org/3';
@@ -44,7 +44,6 @@ export const getMovieVideos = async (id: string | number): Promise<Video[]> => {
 };
 export const getMovieCredits = (id: string | number) => fetchFromTMDB<Credits>(`movie/${id}/credits`);
 export const searchMovies = (query: string) => fetchFromTMDB<PaginatedResponse<Movie>>('search/movie', { query });
-export const getMovieRecommendations = (id: string | number) => fetchFromTMDB<PaginatedResponse<Movie>>(`movie/${id}/recommendations`);
 
 
 // TV Shows
@@ -71,3 +70,5 @@ export const getImageUrl = (path: string, size: 'w300' | 'w500' | 'w780' | 'w128
   if (!path) return '/placeholder.svg';
   return `${IMAGE_BASE_URL}${size}${path}`;
 };
+
+export const getMediaImages = (id: string | number, type: 'movie' | 'tv') => fetchFromTMDB<MediaImageResponse>(`${type}/${id}/images`);
