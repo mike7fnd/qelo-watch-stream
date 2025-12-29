@@ -16,7 +16,7 @@ export default function PlayPage() {
   const id = params.id as string;
   const season = searchParams.get('s') ?? '1';
   const episode = searchParams.get('e') ?? '1';
-  
+
   const [show, setShow] = useState<TVShowDetails | null>(null);
   const { progress, setProgress } = useWatchProgress(`${id}-s${season}-e${episode}`);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -37,7 +37,7 @@ export default function PlayPage() {
     const handleVisibilityChange = () => {
       setIsPlaying(!document.hidden);
     };
-    
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
     // Assume playing on mount if tab is visible
     setIsPlaying(!document.hidden);
@@ -89,7 +89,7 @@ export default function PlayPage() {
       <h1 className="mb-4 text-2xl font-bold md:text-3xl">{show.name} - S{season} E{episode}</h1>
       <div className="aspect-video w-full overflow-hidden rounded-lg border bg-black">
         <iframe
-          src={`https://www.vidking.net/embed/tv/${id}?s=${season}&e=${episode}`}
+          src={`https://www.vidking.net/embed/tv/${id}/${season}/${episode}?color=e50914&autoplay=true`}
           className="h-full w-full"
           allowFullScreen
           title={`Watch ${show.name}`}
