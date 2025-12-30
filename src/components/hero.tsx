@@ -28,9 +28,9 @@ export function Hero({ movies }: HeroProps) {
     if (!api) {
       return
     }
-
+ 
     setCurrent(api.selectedScrollSnap())
-
+ 
     api.on("select", () => {
       setCurrent(api.selectedScrollSnap())
     })
@@ -68,9 +68,9 @@ export function Hero({ movies }: HeroProps) {
 
   return (
     <div className="w-full animate-fade-in-up">
-      <Carousel
+      <Carousel 
         setApi={setApi}
-        opts={{ loop: true }}
+        opts={{ loop: true }} 
         plugins={[
           Autoplay({
             delay: 5000,
@@ -106,12 +106,12 @@ export function Hero({ movies }: HeroProps) {
                       className="object-cover"
                       priority
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent md:bg-gradient-to-r md:from-background md:via-background/70 md:to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent" />
                   </div>
                   <div className="relative z-10 flex h-full items-end pb-10">
                     <div className="container max-w-screen-2xl">
                       <div className="max-w-lg space-y-4 text-white">
-
+                        
                         {/* Desktop view */}
                         <div className="hidden md:block space-y-4">
                             {logos[movie.id] ? (
@@ -134,7 +134,7 @@ export function Hero({ movies }: HeroProps) {
                                 {movie.overview}
                             </p>
                         </div>
-
+                        
                         {/* Mobile view */}
                         <div className="flex flex-col items-center justify-center space-y-2 text-center md:hidden">
                             {logos[movie.id] ? (
@@ -163,7 +163,7 @@ export function Hero({ movies }: HeroProps) {
                                 <span>Play</span>
                                 </Button>
                             </Link>
-
+                            
                             <Link href={getLink(movie)} className="hidden md:inline-flex">
                                 <Button variant="secondary" size="lg" className="bg-white/5 backdrop-blur-sm hover:bg-white/10 w-full sm:w-auto rounded-[30px] border-none">
                                     <Info className="mr-2 h-5 w-5" />
@@ -175,13 +175,13 @@ export function Hero({ movies }: HeroProps) {
                                 <Button
                                     variant="outline"
                                     size="icon"
-                                    className="w-11 h-11 rounded-full border-none bg-black/10 backdrop-blur-sm text-white hover:bg-black/20 hover:text-white"
+                                    className="w-11 h-11 rounded-full border-none bg-white/5 backdrop-blur-sm text-white hover:bg-white/10"
                                     aria-label="More Info"
                                 >
                                     <Info className="h-5 w-5" />
                                 </Button>
                             </Link>
-
+                            
                             <Button
                                 variant="outline"
                                 size="icon"
@@ -202,8 +202,8 @@ export function Hero({ movies }: HeroProps) {
         </CarouselContent>
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
             {movies.map((_, i) => (
-                <div
-                    key={i}
+                <div 
+                    key={i} 
                     className={cn(
                         "h-1.5 w-1.5 rounded-full bg-white/50 transition-all",
                         i === current && "w-4 bg-white"

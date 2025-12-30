@@ -18,12 +18,15 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body bg-background text-foreground antialiased">
+      <body className="bg-background text-foreground antialiased">
         <MyListProvider>
           <div className="relative flex min-h-screen">
             <Sidebar />
-            <main className="flex-1 overflow-x-hidden md:pl-16">{children}</main>
+            <main className="flex-1 overflow-x-hidden md:pl-16 pb-20 md:pb-0">{children}</main>
           </div>
           <Toaster />
         </MyListProvider>

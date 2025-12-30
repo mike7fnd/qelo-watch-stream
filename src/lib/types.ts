@@ -1,3 +1,4 @@
+
 export interface Movie {
   id: number;
   title: string;
@@ -116,4 +117,26 @@ export interface MediaImageResponse {
     id: number;
     logos: MediaImage[];
     posters: MediaImage[];
+}
+
+export interface PersonDetails {
+    id: number;
+    name: string;
+    biography: string;
+    birthday: string | null;
+    deathday: string | null;
+    gender: number;
+    known_for_department: string;
+    place_of_birth: string | null;
+    profile_path: string | null;
+    popularity: number;
+}
+
+export interface PersonCombinedCredits {
+    cast: (Media & { character: string })[];
+    crew: (Media & { job: string })[];
+}
+
+export interface PersonImages {
+    profiles: MediaImage[];
 }

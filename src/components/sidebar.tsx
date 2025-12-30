@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -97,7 +98,7 @@ function SearchBar() {
         placeholder="Search..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="h-10 w-full rounded-md bg-muted pl-10"
+        className="h-10 w-full rounded-[30px] bg-muted pl-10"
         aria-label="Search"
         />
     </form>
@@ -110,7 +111,7 @@ export function Sidebar() {
   return (
     <>
     {/* Desktop Sidebar */}
-    <aside className="fixed left-0 top-0 z-50 hidden h-screen w-16 flex-col items-center gap-8 border-r border-border/40 bg-background py-4 md:flex">
+    <aside className="fixed left-0 top-0 z-50 hidden h-screen w-16 flex-col items-center gap-8 border-r border-border/40 bg-background/60 py-4 backdrop-blur-lg md:flex">
       <Link href="/">
         <Clapperboard className="h-6 w-6 text-primary" />
       </Link>

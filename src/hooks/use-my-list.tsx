@@ -27,18 +27,14 @@ export function MyListProvider({ children }: { children: ReactNode }) {
   const [list, setList] = useState<Media[]>([]);
 
   useEffect(() => {
-    // Initialize state from localStorage only on the client
     setList(getInitialList());
   }, []);
 
   useEffect(() => {
-    // Persist state to localStorage only on the client
-    if (typeof window !== 'undefined') {
-        try {
-            window.localStorage.setItem('qelo-my-list', JSON.stringify(list));
-        } catch (error) {
-            console.warn('Error setting localStorage "qelo-my-list":', error);
-        }
+    try {
+        window.localStorage.setItem('qelo-my-list', JSON.stringify(list));
+    } catch (error) {
+        console.warn('Error setting localStorage "qelo-my-list":', error);
     }
   }, [list]);
 

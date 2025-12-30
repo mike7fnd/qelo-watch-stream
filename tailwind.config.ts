@@ -17,8 +17,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['San Francisco', 'sans-serif'],
-        headline: ['San Francisco', 'sans-serif'],
+        body: ['Inter', 'sans-serif'],
+        headline: ['Inter', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
@@ -105,6 +105,9 @@ export default {
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
       },
+      transitionTimingFunction: {
+        'spring': 'cubic-bezier(0.68, -0.55, 0.27, 1.55)',
+      }
     },
   },
   plugins: [require('tailwindcss-animate')],

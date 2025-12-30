@@ -9,6 +9,7 @@ import { getTvShowSeasonDetails, getImageUrl } from '@/lib/tmdb';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from './ui/button';
 
 interface SeasonSelectorProps {
   showId: number;
@@ -54,15 +55,17 @@ function EpisodeListSkeleton() {
     return (
         <div className="grid grid-cols-1 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
-                 <div key={i} className="flex flex-col overflow-hidden rounded-lg border bg-card md:flex-row">
-                    <Skeleton className="aspect-video w-full md:w-1/3" />
-                    <div className="flex w-full flex-col gap-2 p-4">
-                        <Skeleton className="h-5 w-3/4 rounded-md" />
-                        <Skeleton className="h-4 w-full rounded-md" />
-                        <Skeleton className="h-4 w-5/6 rounded-md" />
-                        <Skeleton className="mt-2 h-4 w-1/2 rounded-md" />
+                 <Card key={i} className="overflow-hidden flex flex-col md:flex-row items-start">
+                    <div className="relative w-full md:w-1/3 aspect-video flex-shrink-0">
+                        <Skeleton className="h-full w-full" />
                     </div>
-                </div>
+                    <div className="p-4 w-full">
+                        <Skeleton className="h-5 w-3/4 mb-2" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-5/6 mt-1" />
+                        <Skeleton className="h-4 w-1/2 mt-4" />
+                    </div>
+                </Card>
             ))}
         </div>
     )

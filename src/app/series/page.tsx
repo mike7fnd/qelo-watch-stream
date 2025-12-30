@@ -1,54 +1,34 @@
-'use client';
 
-import { useEffect, useState } from 'react';
 import { getPopularTvShows } from '@/lib/tmdb';
 import type { Media } from '@/lib/types';
-import { MovieCard } from '@/components/movie-card';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/header';
+import { Hero } from '@/components/hero';
+import { SeriesByService } from '@/components/series-by-service';
+import { PageSearchBar } from '@/components/page-search-bar';
 
-function GridSkeleton() {
-  return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
-      {Array.from({ length: 14 }).map((_, i) => (
-        <div key={i} className="aspect-[2/3]">
-          <Skeleton className="h-full w-full rounded-md" />
-        </div>
-      ))}
-    </div>
-  );
-}
+export default async function SeriesPage({
+  searchParams,
+}: {
+  searchParams: { [key:string]: string | string[] | undefined };
+}) {
+  const page = typeof searchParams.page === 'string' ? Number(searchParams.page) : 1;
+  const popularTvShows = await getPopularTvShows(page);
 
-export default function SeriesPage() {
-  const [shows, setShows] = useState<Media[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-    getPopularTvShows()
-      .then((data) => {
-        const tvShowResults = data.results.map(t => ({...t, media_type: 'tv' as const}));
-        setShows(tvShowResults);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+  const heroShows: Media[] = popularTvShows.results.slice(0, 10).map(show => ({
+    ...show,
+    media_type: 'tv',
+  }));
 
   return (
     <>
       <Header />
-      <div className="container max-w-screen-2xl py-8 animate-fade-in-up">
-        <h1 className="mb-8 text-3xl font-bold">TV Shows</h1>
-        {loading ? (
-          <GridSkeleton />
-        ) : (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
-            {shows.map((item) => (
-              <MovieCard key={item.id} movie={item} />
-            ))}
-          </div>
-        )}
+      <Hero movies={heroShows} />
+      <div className="container max-w-screen-2xl animate-fade-in-up py-8">
+        <div className="mb-8 flex items-center justify-between">
+          <h1 className="text-3xl font-bold">TV Shows</h1>
+          <PageSearchBar />
+        </div>
+        <SeriesByService initialShows={popularTvShows} />
       </div>
     </>
   );

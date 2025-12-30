@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
@@ -10,27 +11,18 @@ import { History, SearchIcon } from 'lucide-react';
 import { Header } from '@/components/header';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Paginator } from '@/components/paginator';
 
 const MAX_HISTORY = 8;
-
-function GridSkeleton() {
-  return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
-      {Array.from({ length: 14 }).map((_, i) => (
-        <div key={i} className="aspect-[2/3]">
-          <Skeleton className="h-full w-full rounded-md" />
-        </div>
-      ))}
-    </div>
-  );
-}
 
 function SearchResults() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get('query');
+  const page = searchParams.get('page') ? Number(searchParams.get('page')) : 1;
   const [results, setResults] = useState<Media[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalPages, setTotalPages] = useState(1);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   useEffect(() => {
@@ -57,12 +49,13 @@ function SearchResults() {
 
 
       Promise.all([
-        searchMovies(query),
-        searchTvShows(query),
+        searchMovies(query, page),
+        searchTvShows(query, page),
       ]).then(([movies, tvShows]) => {
         const movieResults = movies.results.map(m => ({...m, media_type: 'movie' as const}));
         const tvShowResults = tvShows.results.map(t => ({...t, media_type: 'tv' as const}));
         setResults([...movieResults, ...tvShowResults].sort((a, b) => b.popularity - a.popularity));
+        setTotalPages(Math.max(movies.total_pages, tvShows.total_pages));
       }).finally(() => {
         setLoading(false);
       });
@@ -70,24 +63,35 @@ function SearchResults() {
       setResults([]);
       setLoading(false);
     }
-  }, [query]);
+  }, [query, page]);
 
   const handleHistoryClick = (item: string) => {
     router.push(`/search?query=${encodeURIComponent(item)}`);
   };
 
   if (loading) {
-    return <GridSkeleton />;
+    return (
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
+            {Array.from({ length: 14 }).map((_, i) => (
+                <div key={i} className="aspect-[2/3]">
+                    <Skeleton className="h-full w-full rounded-md" />
+                </div>
+            ))}
+        </div>
+    );
   }
   
   if (!query) {
     return (
       <div className="flex h-96 flex-col items-center justify-center gap-4 text-center">
-        <SearchIcon className="h-16 w-16 text-muted-foreground" />
-        <h2 className="text-2xl font-bold">Find your next favorite movie or show</h2>
-        <p className="text-muted-foreground">Use the search bar above to get started.</p>
-        {searchHistory.length > 0 && (
-          <div className="mt-8 w-full max-w-md">
+        {searchHistory.length === 0 ? (
+            <>
+                <SearchIcon className="h-16 w-16 text-muted-foreground" />
+                <h2 className="text-2xl font-bold">Find your next favorite movie or show</h2>
+                <p className="text-muted-foreground">Use the search bar above to get started.</p>
+            </>
+        ) : (
+          <div className="w-full max-w-md">
             <h3 className="flex items-center justify-center gap-2 text-lg font-semibold text-muted-foreground">
               <History className="h-5 w-5" /> Recent Searches
             </h3>
@@ -125,6 +129,7 @@ function SearchResults() {
           <MovieCard key={`${item.media_type}-${item.id}`} movie={item} />
         ))}
       </div>
+      <Paginator currentPage={page} totalPages={totalPages} />
     </>
   );
 }
@@ -136,8 +141,10 @@ function SearchBar() {
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const params = new URLSearchParams();
     if (searchQuery.trim()) {
-      router.push(`/search?query=${encodeURIComponent(searchQuery)}`);
+      params.set('query', searchQuery.trim());
+      router.push(`/search?${params.toString()}`);
     } else {
       router.push('/search');
     }
@@ -149,7 +156,7 @@ function SearchBar() {
   }, [searchParams]);
 
   return (
-    <form onSubmit={handleSearch} className="relative mb-8 w-full max-w-xl mx-auto">
+    <form onSubmit={handleSearch} className="relative mx-auto mb-8 w-full max-w-xl">
         <SearchIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
@@ -157,7 +164,7 @@ function SearchBar() {
           placeholder="Search for movies, TV shows..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="h-12 w-full rounded-md bg-muted pl-10 text-base"
+          className="h-12 w-full rounded-[30px] bg-muted pl-10 text-base"
           aria-label="Search"
         />
     </form>

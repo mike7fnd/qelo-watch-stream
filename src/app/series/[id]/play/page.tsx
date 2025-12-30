@@ -16,7 +16,7 @@ export default function PlayPage() {
   const id = params.id as string;
   const season = searchParams.get('s') ?? '1';
   const episode = searchParams.get('e') ?? '1';
-
+  
   const [show, setShow] = useState<TVShowDetails | null>(null);
   const { progress, setProgress } = useWatchProgress(`${id}-s${season}-e${episode}`);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -37,7 +37,7 @@ export default function PlayPage() {
     const handleVisibilityChange = () => {
       setIsPlaying(!document.hidden);
     };
-
+    
     document.addEventListener('visibilitychange', handleVisibilityChange);
     // Assume playing on mount if tab is visible
     setIsPlaying(!document.hidden);
