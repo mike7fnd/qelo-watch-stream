@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { getPopularMovies, getMediaByProvider } from '@/lib/tmdb';
 import type { Media, PaginatedResponse } from '@/lib/types';
 import { MovieCard } from '@/components/movie-card';
@@ -24,13 +25,29 @@ interface MoviesByServiceProps {
 }
 
 export function MoviesByService({ initialMovies }: MoviesByServiceProps) {
+  const searchParams = useSearchParams();
+  const pageFromUrl = searchParams.get('page');
+  const initialPage = pageFromUrl ? Number(pageFromUrl) : 1;
+
   const [activeTab, setActiveTab] = useState('popular');
   const [movies, setMovies] = useState<Media[]>(initialMovies.results);
   const [loading, setLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(initialMovies.total_pages);
 
   useEffect(() => {
+    const newPage = pageFromUrl ? Number(pageFromUrl) : 1;
+    if (newPage !== currentPage) {
+      setCurrentPage(newPage);
+    }
+  }, [pageFromUrl, currentPage]);
+
+  useEffect(() => {
+    // Don't fetch if it's the first page and we have initial data.
+    if (currentPage === 1 && activeTab === 'popular' && movies === initialMovies.results) {
+        return;
+    }
+
     setLoading(true);
     let promise;
     if (activeTab === 'popular') {
@@ -46,16 +63,11 @@ export function MoviesByService({ initialMovies }: MoviesByServiceProps) {
     }).finally(() => {
         setLoading(false);
     });
-  }, [activeTab, currentPage]);
-  
+  }, [activeTab, currentPage, initialMovies.results]);
+
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     setCurrentPage(1); // Reset to first page on tab change
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    // The effect will handle fetching the new data
   };
 
   return (
@@ -65,7 +77,7 @@ export function MoviesByService({ initialMovies }: MoviesByServiceProps) {
           <TabsTrigger key={service.id} value={service.id}>{service.name}</TabsTrigger>
         ))}
       </TabsList>
-      
+
         {loading ? (
           <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
             {Array.from({ length: 20 }).map((_, i) => (
@@ -82,8 +94,8 @@ export function MoviesByService({ initialMovies }: MoviesByServiceProps) {
               ))}
             </div>
             {movies.length > 0 && totalPages > 1 && (
-                <Paginator 
-                    currentPage={currentPage} 
+                <Paginator
+                    currentPage={currentPage}
                     totalPages={totalPages}
                 />
             )}

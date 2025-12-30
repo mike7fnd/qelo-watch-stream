@@ -63,7 +63,7 @@ export default function MovieDetailPage() {
     };
     fetchData();
   }, [id]);
-  
+
   if (!movieDetails || !credits) {
     return null; // Or a loading skeleton
   }
@@ -192,7 +192,7 @@ export default function MovieDetailPage() {
                     </>
                   )}
                 </div>
-                
+
                 <p className="pt-4 text-xs font-light text-white/80 line-clamp-3 text-center px-4">
                     {movieDetails.overview}
                 </p>
