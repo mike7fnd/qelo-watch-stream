@@ -218,6 +218,4 @@ export default function TVShowDetailPage() {
       </div>
     </div>
   );
-
-
-
+}
