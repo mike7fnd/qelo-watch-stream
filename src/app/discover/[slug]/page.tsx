@@ -2,7 +2,7 @@
 import { getDiscoverMedia, getDiscoverTitle } from '@/lib/discover';
 import type { Media } from '@/lib/types';
 import { MovieCard } from '@/components/movie-card';
-import { Header } from '@/components/header';
+
 import { Paginator } from '@/components/paginator';
 
 export default async function DiscoverPage({
@@ -18,7 +18,7 @@ export default async function DiscoverPage({
 
   return (
     <>
-      <Header />
+      
       <div className="container max-w-screen-2xl animate-fade-in-up py-8">
         <h1 className="mb-8 text-3xl font-bold">{title}</h1>
         <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">

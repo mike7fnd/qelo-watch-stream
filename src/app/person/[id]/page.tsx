@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { getPersonDetails, getPersonCombinedCredits, getPersonImages, getImageUrl } from '@/lib/tmdb';
 import type { PersonDetails, PersonCombinedCredits, PersonImages, Media } from '@/lib/types';
 import { MovieCarousel } from '@/components/movie-carousel';
-import { Header } from '@/components/header';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import { User, Calendar, MapPin, BookText, Images } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -19,19 +19,19 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 function PersonPageSkeleton() {
   return (
     <div className="container mx-auto max-w-screen-2xl p-4 md:p-8 animate-pulse">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 pt-20 md:grid-cols-3">
             <div className="flex flex-col items-center md:items-start">
-                <Skeleton className="h-64 w-64 rounded-full md:h-80 md:w-80" />
+                <Skeleton className="h-[450px] w-[300px] rounded-lg" />
             </div>
             <div className="md:col-span-2">
                 <Skeleton className="h-12 w-1/2 mb-4" />
-                <Skeleton className="h-4 w-1/4 mb-6" />
-                <Skeleton className="h-6 w-1/3 mb-4" />
-                <div className="space-y-2">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-5/6" />
-                    <Skeleton className="h-4 w-4/6" />
+                <div className="space-y-2 mt-4">
+                    <Skeleton className="h-4 w-1/3" />
+                    <Skeleton className="h-4 w-1/4" />
+                </div>
+                <div className="mt-8 flex items-center gap-4">
+                  <Skeleton className="h-10 w-32 rounded-md" />
+                  <Skeleton className="h-10 w-32 rounded-md" />
                 </div>
             </div>
         </div>
@@ -39,10 +39,10 @@ function PersonPageSkeleton() {
             <div>
                 <Skeleton className="h-8 w-1/4 mb-4 rounded-lg" />
                 <div className="flex space-x-4">
-                    {Array.from({ length: 6 }).map((_, j) => (
-                        <div key={j} className="w-1/2 flex-shrink-0 sm:w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6">
+                    {Array.from({ length: 7 }).map((_, j) => (
+                        <div key={j} className="w-1/2 flex-shrink-0 sm:w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 2xl:w-[14.28%]">
                         <div className="aspect-[2/3]">
-                            <Skeleton className="h-full w-full rounded-lg" />
+                            <Skeleton className="h-full w-full rounded-[15px]" />
                         </div>
                         </div>
                     ))}
@@ -51,10 +51,10 @@ function PersonPageSkeleton() {
             <div>
                 <Skeleton className="h-8 w-1/4 mb-4 rounded-lg" />
                 <div className="flex space-x-4">
-                    {Array.from({ length: 6 }).map((_, j) => (
-                        <div key={j} className="w-1/2 flex-shrink-0 sm:w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6">
+                     {Array.from({ length: 7 }).map((_, j) => (
+                        <div key={j} className="w-1/2 flex-shrink-0 sm:w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 2xl:w-[14.28%]">
                         <div className="aspect-[2/3]">
-                            <Skeleton className="h-full w-full rounded-lg" />
+                            <Skeleton className="h-full w-full rounded-[15px]" />
                         </div>
                         </div>
                     ))}
@@ -97,7 +97,7 @@ export default function PersonPage() {
   if (loading || !person || !credits || !images) {
     return (
         <>
-            <Header />
+            
             <BackButton />
             <PersonPageSkeleton />
         </>
@@ -113,7 +113,7 @@ export default function PersonPage() {
 
   return (
     <>
-        <Header />
+        
         <BackButton />
         <div className="container mx-auto max-w-screen-2xl p-4 md:p-8 animate-fade-in-up">
         <div className="grid grid-cols-1 gap-8 pt-20 md:grid-cols-3">
@@ -215,5 +215,3 @@ export default function PersonPage() {
     </>
   );
 }
-
-    

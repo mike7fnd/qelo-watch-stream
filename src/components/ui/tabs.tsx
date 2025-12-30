@@ -14,50 +14,52 @@ const TabsList = React.forwardRef<
 >(({ className, children, ...props }, ref) => {
   const [indicatorStyle, setIndicatorStyle] = React.useState({ left: 0, width: 0 });
   const listRef = React.useRef<HTMLDivElement>(null);
+  const localRef = React.useRef<HTMLDivElement | null>(null);
 
-  const onValueChange = (value: string) => {
-    const trigger = listRef.current?.querySelector(`[data-state="active"]`) as HTMLElement | null;
-    if (trigger) {
-        const { offsetLeft, clientWidth } = trigger;
-        setIndicatorStyle({ left: offsetLeft, width: clientWidth });
-    }
-  };
+  React.useImperativeHandle(ref, () => localRef.current as HTMLDivElement);
 
   React.useEffect(() => {
-    // Set initial position
-    const trigger = listRef.current?.querySelector(`[data-state="active"]`) as HTMLElement | null;
-    if (trigger) {
-        const { offsetLeft, clientWidth } = trigger;
-        setIndicatorStyle({ left: offsetLeft, width: clientWidth });
-    }
+    const currentRef = localRef.current ?? listRef.current;
+    if (!currentRef) return;
 
-    // Use MutationObserver to handle initial render and dynamic tab changes
+    const setIndicator = () => {
+      const trigger = currentRef.querySelector(`[data-state="active"]`) as HTMLElement | null;
+      if (trigger) {
+          const { offsetLeft, clientWidth } = trigger;
+          setIndicatorStyle({ left: offsetLeft, width: clientWidth });
+      }
+    };
+
+    setIndicator(); // Set initial position
+
     const observer = new MutationObserver((mutations) => {
         for (const mutation of mutations) {
             if (mutation.type === 'attributes' && mutation.attributeName === 'data-state') {
-                const activeTrigger = listRef.current?.querySelector(`[data-state="active"]`) as HTMLElement | null;
-                if (activeTrigger) {
-                    const { offsetLeft, clientWidth } = activeTrigger;
-                    setIndicatorStyle({ left: offsetLeft, width: clientWidth });
-                }
+                setIndicator();
+                break;
             }
         }
     });
 
-    if (listRef.current) {
-        Array.from(listRef.current.children).forEach(child => {
-            if (child.getAttribute('role') === 'tab') {
-                observer.observe(child, { attributes: true, attributeFilter: ['data-state'] });
-            }
-        });
-    }
+    Array.from(currentRef.children).forEach(child => {
+        if (child.getAttribute('role') === 'tab') {
+            observer.observe(child, { attributes: true, attributeFilter: ['data-state'] });
+        }
+    });
 
     return () => observer.disconnect();
-  }, []);
+  }, [children]); // Re-run when children change to re-attach observer
 
   return (
     <TabsPrimitive.List
-      ref={listRef}
+      ref={(el) => {
+        listRef.current = el;
+        if (typeof ref === 'function') {
+          ref(el);
+        } else if (ref) {
+          ref.current = el;
+        }
+      }}
       className={cn(
         "relative inline-flex h-10 items-center justify-center rounded-[30px] bg-muted p-1 text-muted-foreground",
         className

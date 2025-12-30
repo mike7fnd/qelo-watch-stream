@@ -1,12 +1,13 @@
+
 'use client';
 
 import { Users } from 'lucide-react';
-import { Header } from '@/components/header';
+
 
 export default function SharedPage() {
   return (
     <>
-      <Header />
+      
       <div className="container max-w-screen-2xl py-8 animate-fade-in-up">
         <h1 className="mb-8 text-3xl font-bold">Shared With You</h1>
         <div className="flex flex-col items-center justify-center gap-4 text-center h-96">

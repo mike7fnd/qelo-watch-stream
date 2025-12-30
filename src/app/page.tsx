@@ -1,8 +1,10 @@
+
 import { Hero } from '@/components/hero';
 import { MovieCarousel } from '@/components/movie-carousel';
 import { StreamingServiceSelector } from '@/components/streaming-service-selector';
 import { getPopularMovies, getTopRatedMovies, getUpcomingMovies, getPopularTvShows, getTopRatedTvShows, getKdramas, getAnimatedShows, getNowPlayingMovies, getAnimatedMovies } from '@/lib/tmdb';
 import type { Media } from '@/lib/types';
+import { ContinueWatching } from '@/components/continue-watching';
 
 export default async function Home() {
   const popularMoviesData = getPopularMovies();
@@ -48,6 +50,7 @@ export default async function Home() {
     <div className="flex flex-col">
       {heroShows.length > 0 && <Hero movies={heroShows} />}
       <div className="container max-w-screen-2xl space-y-12 py-12">
+        <ContinueWatching />
         <MovieCarousel 
           title="New This Week" 
           movies={[...upcomingMovies.results, ...topRatedTvShows.results.slice(10,20)].sort((a,b) => b.popularity - a.popularity).map(m => ({...m, media_type: 'name' in m ? 'tv' : 'movie'}))} 

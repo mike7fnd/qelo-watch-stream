@@ -1,7 +1,7 @@
 
 import { getPopularTvShows } from '@/lib/tmdb';
 import type { Media } from '@/lib/types';
-import { Header } from '@/components/header';
+
 import { Hero } from '@/components/hero';
 import { SeriesByService } from '@/components/series-by-service';
 import { PageSearchBar } from '@/components/page-search-bar';
@@ -21,7 +21,7 @@ export default async function SeriesPage({
 
   return (
     <>
-      <Header />
+      
       <Hero movies={heroShows} />
       <div className="container max-w-screen-2xl animate-fade-in-up py-8">
         <div className="mb-8 flex items-center justify-between">

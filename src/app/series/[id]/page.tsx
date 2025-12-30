@@ -27,6 +27,8 @@ function formatRuntime(minutes: number[] | null) {
   return `${hours}h ${mins}m/ep`;
 }
 
+const STREAMING_SERVICE_IDS = [8, 337, 9, 1899, 2552, 453, 56];
+
 export default function TVShowDetailPage() {
   const params = useParams();
   const id = params.id as string;
@@ -82,6 +84,9 @@ export default function TVShowDetailPage() {
     }
   };
 
+  const streamingNetwork = showDetails.networks.find(n => STREAMING_SERVICE_IDS.includes(n.id)) || showDetails.networks.find(n => n.logo_path);
+
+
   return (
     <div className="min-h-screen animate-fade-in-up">
       <div className="relative h-screen w-full">
@@ -93,23 +98,23 @@ export default function TVShowDetailPage() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
         </div>
         <div className="relative z-10 flex h-full items-end pb-10">
             <div className="container max-w-screen-2xl">
                 {/* Desktop View */}
-                <div className="hidden md:block max-w-lg space-y-2">
+                <div className="hidden md:block max-w-lg">
                      {logoUrl ? (
-                        <div className="relative h-40">
-                        <Image
-                            src={logoUrl}
-                            alt={showDetails.name}
-                            fill
-                            className="object-contain object-left"
-                        />
+                        <div className="relative h-40 mb-2">
+                          <Image
+                              src={logoUrl}
+                              alt={showDetails.name}
+                              fill
+                              className="object-contain object-left"
+                          />
                         </div>
                     ) : (
-                        <h1 className="font-headline text-4xl font-semibold md:text-7xl text-shadow-lg">{showDetails.name}</h1>
+                        <h1 className="font-headline text-4xl font-semibold md:text-7xl text-shadow-lg mb-2">{showDetails.name}</h1>
                     )}
                     <div className="flex items-center gap-4 text-sm md:text-base">
                         {showDetails.genres[0] && <span>{showDetails.genres[0].name}</span>}
@@ -125,8 +130,21 @@ export default function TVShowDetailPage() {
                                 <span>{showDetails.number_of_seasons} Season{showDetails.number_of_seasons > 1 ? 's' : ''}</span>
                              </>
                         )}
+                        {streamingNetwork?.logo_path && (
+                            <>
+                                <div className="h-4 w-px bg-white/30" />
+                                <div className="relative h-4 w-12">
+                                    <Image
+                                        src={getImageUrl(streamingNetwork.logo_path, 'w300')}
+                                        alt={streamingNetwork.name}
+                                        fill
+                                        className="object-contain object-left invert brightness-0"
+                                    />
+                                </div>
+                            </>
+                        )}
                     </div>
-                     <p className="pt-2 text-sm font-light text-white/80 line-clamp-3 md:text-base text-shadow-md">
+                     <p className="pt-4 text-sm font-light text-white/80 line-clamp-3 md:text-base text-shadow-md">
                         {showDetails.overview}
                     </p>
                     <div className="flex items-center gap-3 pt-4">
@@ -163,6 +181,19 @@ export default function TVShowDetailPage() {
                     {showDetails.genres[0] && <span>{showDetails.genres[0].name}</span>}
                     {showDetails.first_air_date && <span>| {showDetails.first_air_date.substring(0, 4)}</span>}
                     {showDetails.number_of_seasons > 0 && <span>| {showDetails.number_of_seasons} seasons</span>}
+                     {streamingNetwork?.logo_path && (
+                        <>
+                           <span className="mx-1">|</span>
+                           <div className="relative h-2 w-6">
+                                <Image
+                                    src={getImageUrl(streamingNetwork.logo_path, 'w300')}
+                                    alt={streamingNetwork.name}
+                                    fill
+                                    className="object-contain object-left invert brightness-0"
+                                />
+                            </div>
+                        </>
+                     )}
                   </div>
 
                   <p className="pt-4 text-xs font-light text-white/80 line-clamp-3 text-center px-4">

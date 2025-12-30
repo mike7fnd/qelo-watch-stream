@@ -1,16 +1,17 @@
+
 'use client';
 
 import { useMyList } from '@/hooks/use-my-list';
 import { MovieCard } from '@/components/movie-card';
 import { Film } from 'lucide-react';
-import { Header } from '@/components/header';
+
 
 export default function MyListPage() {
   const { list } = useMyList();
 
   return (
     <>
-      <Header />
+      
       <div className="container max-w-screen-2xl py-8 animate-fade-in-up">
         <h1 className="mb-8 text-3xl font-bold">My List</h1>
         {list.length === 0 ? (

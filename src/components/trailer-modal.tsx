@@ -3,7 +3,7 @@
 
 import { Youtube } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
 interface TrailerModalProps {
@@ -21,6 +21,9 @@ export function TrailerModal({ trailerKey, buttonClassName }: TrailerModalProps)
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl p-0 border-0">
+        <DialogHeader>
+            <DialogTitle className="sr-only">Watch Trailer</DialogTitle>
+        </DialogHeader>
         <div className="aspect-video">
           <iframe
             className="h-full w-full rounded-lg"

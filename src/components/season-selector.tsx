@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -18,13 +19,13 @@ interface SeasonSelectorProps {
 
 function EpisodeCard({ showId, seasonNumber, episode }: { showId: number, seasonNumber: number, episode: Episode }) {
     return (
-        <Card className="overflow-hidden flex flex-col md:flex-row items-start group">
+        <Card className="overflow-hidden flex flex-col md:flex-row items-start group border-0 rounded-[15px]">
             <div className="relative w-full md:w-1/3 aspect-video flex-shrink-0">
                 <Image
                     src={getImageUrl(episode.still_path || '', 'w500')}
                     alt={episode.name}
                     fill
-                    className="object-cover"
+                    className="object-cover md:rounded-l-[15px] md:rounded-r-none rounded-t-[15px]"
                 />
                 <Link href={`/series/${showId}/play?s=${seasonNumber}&e=${episode.episode_number}`} className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
                     <PlayCircle className="h-12 w-12 text-white" />
@@ -37,7 +38,7 @@ function EpisodeCard({ showId, seasonNumber, episode }: { showId: number, season
                             E{episode.episode_number}: {episode.name}
                         </Link>
                     </h3>
-                    <p className="text-xs md:text-sm text-muted-foreground mt-2 line-clamp-2">{episode.overview}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mt-2 line-clamp-2 md:line-clamp-3 lg:line-clamp-4">{episode.overview}</p>
                 </div>
                 <div className="flex items-center gap-4 text-xs mt-2 text-muted-foreground">
                     {episode.air_date && <span>{episode.air_date}</span>}
@@ -55,15 +56,20 @@ function EpisodeListSkeleton() {
     return (
         <div className="grid grid-cols-1 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
-                 <Card key={i} className="overflow-hidden flex flex-col md:flex-row items-start">
+                 <Card key={i} className="overflow-hidden flex flex-col md:flex-row items-start border-0 rounded-[15px]">
                     <div className="relative w-full md:w-1/3 aspect-video flex-shrink-0">
-                        <Skeleton className="h-full w-full" />
+                        <Skeleton className="h-full w-full md:rounded-l-[15px] md:rounded-r-none rounded-t-[15px]" />
                     </div>
-                    <div className="p-4 w-full">
-                        <Skeleton className="h-5 w-3/4 mb-2" />
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-5/6 mt-1" />
-                        <Skeleton className="h-4 w-1/2 mt-4" />
+                    <div className="p-4 flex flex-col justify-between h-full w-full">
+                        <div>
+                            <Skeleton className="h-5 w-3/4 mb-2" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-5/6 mt-1" />
+                        </div>
+                        <div className="flex items-center gap-4 mt-2">
+                           <Skeleton className="h-4 w-1/4" />
+                           <Skeleton className="h-4 w-1/4" />
+                        </div>
                     </div>
                 </Card>
             ))}

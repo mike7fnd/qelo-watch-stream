@@ -11,10 +11,18 @@ export interface Movie {
   media_type?: 'movie';
 }
 
+export interface ProductionCompany {
+  id: number;
+  logo_path: string | null;
+  name: string;
+  origin_country: string;
+}
+
 export interface MovieDetails extends Movie {
   genres: { id: number; name: string }[];
   runtime: number | null;
   tagline: string | null;
+  production_companies: ProductionCompany[];
 }
 
 export interface TVShow {

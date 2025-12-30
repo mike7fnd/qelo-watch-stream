@@ -23,6 +23,12 @@ export function Hero({ movies }: HeroProps) {
   const [api, setApi] = React.useState<CarouselApi>()
   const [current, setCurrent] = React.useState(0)
   const [logos, setLogos] = React.useState<Record<number, string | null>>({});
+  const autoplay = React.useRef(
+    Autoplay({
+      delay: 5000,
+      stopOnInteraction: true,
+    })
+  );
 
   React.useEffect(() => {
     if (!api) {
@@ -71,13 +77,7 @@ export function Hero({ movies }: HeroProps) {
       <Carousel 
         setApi={setApi}
         opts={{ loop: true }} 
-        plugins={[
-          Autoplay({
-            delay: 5000,
-            stopOnInteraction: true,
-            stopOnMouseEnter: true,
-          }),
-        ]}
+        plugins={[autoplay.current]}
         className="w-full"
       >
         <CarouselContent>
@@ -200,7 +200,11 @@ export function Hero({ movies }: HeroProps) {
             );
           })}
         </CarouselContent>
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+        <div 
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2"
+          onMouseEnter={() => autoplay.current.stop()}
+          onMouseLeave={() => autoplay.current.play()}
+        >
             {movies.map((_, i) => (
                 <div 
                     key={i} 

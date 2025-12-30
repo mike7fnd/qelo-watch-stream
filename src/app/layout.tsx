@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { MyListProvider } from '@/hooks/use-my-list';
-import { Sidebar } from '@/components/sidebar';
+import { Header } from '@/components/header';
 
 export const metadata: Metadata = {
   title: 'Qelo',
@@ -24,10 +24,8 @@ export default function RootLayout({
       </head>
       <body className="bg-background text-foreground antialiased">
         <MyListProvider>
-          <div className="relative flex min-h-screen">
-            <Sidebar />
-            <main className="flex-1 overflow-x-hidden md:pl-16 pb-20 md:pb-0">{children}</main>
-          </div>
+          <Header />
+          <main className="flex-1 overflow-x-hidden pb-20 md:pb-0">{children}</main>
           <Toaster />
         </MyListProvider>
       </body>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useWatchProgress } from '@/hooks/use-watch-progress';
@@ -64,12 +65,19 @@ export default function PlayPage() {
   if (!movie) {
     return (
       <div className="container mx-auto p-4 md:p-8 animate-pulse">
-        <Skeleton className="mb-4 h-8 w-1/4" />
+        <Skeleton className="mb-4 h-6 w-32" />
         <Skeleton className="mb-4 h-8 w-1/2" />
         <div className="aspect-video w-full">
             <Skeleton className="h-full w-full rounded-lg" />
         </div>
-        <Skeleton className="mt-4 h-4 w-full" />
+        <div className="mt-6">
+          <Skeleton className="h-7 w-48 mb-2" />
+          <div className="mt-2 flex items-center gap-4">
+            <Skeleton className="h-2 w-full" />
+            <Skeleton className="h-5 w-10" />
+          </div>
+          <Skeleton className="mt-2 h-4 w-3/4" />
+        </div>
       </div>
     );
   }
@@ -95,7 +103,7 @@ export default function PlayPage() {
         <h3 className="text-lg font-semibold">Watch Progress</h3>
         <div className="mt-2 flex items-center gap-4">
             <Progress value={progress} className="w-full h-2" />
-            <span className="text-sm font-mono text-muted-foreground">{Math.round(progress)}%</span>
+            <span className="text-sm text-muted-foreground">{Math.round(progress)}%</span>
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
           Your watch progress is saved automatically. Progress is estimated while this page is open.

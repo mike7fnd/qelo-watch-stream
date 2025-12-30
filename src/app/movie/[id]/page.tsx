@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { PlayCircle, Plus, Check } from 'lucide-react';
 import { getImageUrl, getMovieDetails, getMovieVideos, getMovieCredits, getMediaImages, getMovieRecommendations } from '@/lib/tmdb';
-import type { MovieDetails as MovieDetailsType, Video, Credits, Media } from '@/lib/types';
+import type { MovieDetails as MovieDetailsType, Video, Credits, Media, ProductionCompany } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { TrailerModal } from '@/components/trailer-modal';
 import { CastCarousel } from '@/components/cast-carousel';
@@ -24,6 +24,8 @@ function formatRuntime(minutes: number | null) {
   const mins = minutes % 60;
   return `${hours}h ${mins}m`;
 }
+
+const STREAMING_SERVICE_IDS = [8, 337, 9, 1899, 2552, 453]; // Netflix, Disney+, Prime Video, Max, Apple TV+, Hulu
 
 export default function MovieDetailPage() {
   const params = useParams();
@@ -61,7 +63,7 @@ export default function MovieDetailPage() {
     };
     fetchData();
   }, [id]);
-
+  
   if (!movieDetails || !credits) {
     return null; // Or a loading skeleton
   }
@@ -78,6 +80,10 @@ export default function MovieDetailPage() {
     }
   };
 
+  const streamingService = movieDetails.production_companies.find(
+    company => STREAMING_SERVICE_IDS.includes(company.id)
+  ) || movieDetails.production_companies.find(company => company.logo_path);
+
   return (
     <div className="min-h-screen animate-fade-in-up">
       <div className="relative h-screen w-full">
@@ -89,24 +95,24 @@ export default function MovieDetailPage() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
         </div>
         <div className="relative z-10 flex h-full items-end pb-10">
             <div className="container max-w-screen-2xl">
               {/* Desktop View */}
-              <div className="hidden md:block max-w-lg space-y-2">
+              <div className="hidden md:block max-w-lg">
                   {logoUrl ? (
-                    <div className="relative h-40">
-                    <Image
-                        src={logoUrl}
-                        alt={movieDetails.title}
-                        fill
-                        className="object-contain object-left"
-                    />
+                    <div className="relative h-40 mb-2">
+                      <Image
+                          src={logoUrl}
+                          alt={movieDetails.title}
+                          fill
+                          className="object-contain object-left"
+                      />
                     </div>
-                ) : (
-                    <h1 className="font-headline text-4xl font-semibold md:text-7xl text-shadow-lg">{movieDetails.title}</h1>
-                )}
+                  ) : (
+                    <h1 className="font-headline text-4xl font-semibold md:text-7xl text-shadow-lg mb-2">{movieDetails.title}</h1>
+                  )}
                 <div className="flex items-center gap-4 text-sm md:text-base">
                   {movieDetails.genres[0] && <span>{movieDetails.genres[0].name}</span>}
                   {movieDetails.release_date && (
@@ -121,8 +127,21 @@ export default function MovieDetailPage() {
                       <span>{formatRuntime(movieDetails.runtime)}</span>
                     </>
                   )}
+                  {streamingService?.logo_path && (
+                    <>
+                        <div className="h-4 w-px bg-white/30" />
+                        <div className="relative h-4 w-12">
+                            <Image
+                                src={getImageUrl(streamingService.logo_path, 'w300')}
+                                alt={streamingService.name}
+                                fill
+                                className="object-contain object-left invert brightness-0"
+                            />
+                        </div>
+                    </>
+                  )}
                 </div>
-                <p className="pt-2 text-sm font-light text-white/80 line-clamp-3 md:text-base text-shadow-md">
+                <p className="pt-4 text-sm font-light text-white/80 line-clamp-3 md:text-base text-shadow-md">
                     {movieDetails.overview}
                 </p>
                 <div className="flex items-center gap-3 pt-4">
@@ -159,8 +178,21 @@ export default function MovieDetailPage() {
                   {movieDetails.genres[0] && <span>{movieDetails.genres[0].name}</span>}
                   {movieDetails.release_date && <span>| {movieDetails.release_date.substring(0, 4)}</span>}
                   {movieDetails.runtime && <span>| {formatRuntime(movieDetails.runtime)}</span>}
+                  {streamingService?.logo_path && (
+                    <>
+                        <span className="mx-1">|</span>
+                        <div className="relative h-2 w-6">
+                            <Image
+                                src={getImageUrl(streamingService.logo_path, 'w300')}
+                                alt={streamingService.name}
+                                fill
+                                className="object-contain object-left invert brightness-0"
+                            />
+                        </div>
+                    </>
+                  )}
                 </div>
-
+                
                 <p className="pt-4 text-xs font-light text-white/80 line-clamp-3 text-center px-4">
                     {movieDetails.overview}
                 </p>

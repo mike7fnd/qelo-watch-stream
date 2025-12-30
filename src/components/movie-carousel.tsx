@@ -25,7 +25,7 @@ export function MovieCarousel({ title, movies, href, className, style }: MovieCa
   );
 
   return (
-    <section className={cn("animate-fade-in-up group relative", className)} style={style}>
+    <section className={cn("animate-fade-in-up relative", className)} style={style}>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-headline text-2xl font-bold">{title}</h2>
         {href && (
