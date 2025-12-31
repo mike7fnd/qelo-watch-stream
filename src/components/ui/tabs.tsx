@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -14,12 +13,9 @@ const TabsList = React.forwardRef<
 >(({ className, children, ...props }, ref) => {
   const [indicatorStyle, setIndicatorStyle] = React.useState({ left: 0, width: 0 });
   const listRef = React.useRef<HTMLDivElement>(null);
-  const localRef = React.useRef<HTMLDivElement | null>(null);
-
-  React.useImperativeHandle(ref, () => localRef.current as HTMLDivElement);
 
   React.useEffect(() => {
-    const currentRef = localRef.current ?? listRef.current;
+    const currentRef = listRef.current;
     if (!currentRef) return;
 
     const setIndicator = () => {
@@ -47,19 +43,18 @@ const TabsList = React.forwardRef<
         }
     });
 
-    return () => observer.disconnect();
-  }, [children]); // Re-run when children change to re-attach observer
+    // Also listen for resize to recalculate
+    window.addEventListener('resize', setIndicator);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', setIndicator);
+    }
+  }, []); // Empty dependency array ensures this runs only once on mount and cleanup
 
   return (
     <TabsPrimitive.List
-      ref={(el) => {
-        listRef.current = el;
-        if (typeof ref === 'function') {
-          ref(el);
-        } else if (ref) {
-          ref.current = el;
-        }
-      }}
+      ref={listRef}
       className={cn(
         "relative inline-flex h-10 items-center justify-center rounded-[30px] bg-muted p-1 text-muted-foreground",
         className

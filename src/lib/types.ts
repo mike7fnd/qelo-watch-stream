@@ -8,7 +8,7 @@ export interface Movie {
   overview: string;
   release_date: string;
   genre_ids: number[];
-  media_type?: 'movie';
+  media_type: 'movie';
 }
 
 export interface ProductionCompany {
@@ -35,7 +35,7 @@ export interface TVShow {
   first_air_date: string;
   genre_ids: number[];
   origin_country: string[];
-  media_type?: 'tv';
+  media_type: 'tv';
 }
 
 export interface Season {

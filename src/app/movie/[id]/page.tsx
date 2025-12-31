@@ -27,43 +27,60 @@ function formatRuntime(minutes: number | null) {
 
 const STREAMING_SERVICE_IDS = [8, 337, 9, 1899, 2552, 453]; // Netflix, Disney+, Prime Video, Max, Apple TV+, Hulu
 
+// Simple in-memory cache
+const cache = new Map<string, any>();
+
+
 export default function MovieDetailPage() {
   const params = useParams();
   const id = params.id as string;
-  const [movieDetails, setMovieDetails] = React.useState<MovieDetailsType | null>(null);
-  const [videos, setVideos] = React.useState<Video[]>([]);
-  const [credits, setCredits] = React.useState<Credits | null>(null);
-  const [logoUrl, setLogoUrl] = React.useState<string | null>(null);
-  const [recommendations, setRecommendations] = React.useState<Media[]>([]);
+  const [movieDetails, setMovieDetails] = React.useState<MovieDetailsType | null>(() => cache.get(`movie_${id}_details`));
+  const [videos, setVideos] = React.useState<Video[]>(() => cache.get(`movie_${id}_videos`) || []);
+  const [credits, setCredits] = React.useState<Credits | null>(() => cache.get(`movie_${id}_credits`));
+  const [logoUrl, setLogoUrl] = React.useState<string | null>(() => cache.get(`movie_${id}_logo`));
+  const [recommendations, setRecommendations] = React.useState<Media[]>(() => cache.get(`movie_${id}_recommendations`) || []);
   const { addToList, removeFromList, isInList } = useMyList();
 
   React.useEffect(() => {
     const fetchData = async () => {
       if (!id) return;
+
+      // If we have cached data, we don't need to fetch again.
+      if (cache.has(`movie_${id}_details`)) {
+        return;
+      }
+
       try {
         const details = await getMovieDetails(id);
         setMovieDetails(details);
+        cache.set(`movie_${id}_details`, details);
 
         const videoData = await getMovieVideos(id);
         setVideos(videoData);
+        cache.set(`movie_${id}_videos`, videoData);
 
         const creditData = await getMovieCredits(id);
         setCredits(creditData);
+        cache.set(`movie_${id}_credits`, creditData);
 
         const imageData = await getMediaImages(id, 'movie');
         const englishLogo = imageData.logos.find(l => l.iso_639_1 === 'en');
         const logoPath = englishLogo?.file_path || (imageData.logos.length > 0 ? imageData.logos[0].file_path : null);
-        setLogoUrl(logoPath ? getImageUrl(logoPath, 'w500') : null);
+        const newLogoUrl = logoPath ? getImageUrl(logoPath, 'w500') : null;
+        setLogoUrl(newLogoUrl);
+        cache.set(`movie_${id}_logo`, newLogoUrl);
 
         const recommendationsData = await getMovieRecommendations(id);
-        setRecommendations(recommendationsData.results.map(m => ({ ...m, media_type: 'movie' })));
+        const recs = recommendationsData.results.map(m => ({ ...m, media_type: 'movie' as const }));
+        setRecommendations(recs);
+        cache.set(`movie_${id}_recommendations`, recs);
       } catch (error) {
         console.error("Failed to fetch movie data:", error);
       }
     };
     fetchData();
   }, [id]);
-
+  
   if (!movieDetails || !credits) {
     return null; // Or a loading skeleton
   }
@@ -192,7 +209,7 @@ export default function MovieDetailPage() {
                     </>
                   )}
                 </div>
-
+                
                 <p className="pt-4 text-xs font-light text-white/80 line-clamp-3 text-center px-4">
                     {movieDetails.overview}
                 </p>
@@ -240,7 +257,7 @@ export default function MovieDetailPage() {
         </div>
       </div>
 
-      <div className="container max-w-screen-2xl py-12 space-y-12">
+      <div className="container max-w-screen-2xl pt-6 pb-12 md:py-12 space-y-12">
         <CastCarousel cast={credits.cast} />
         <MovieCarousel title="You May Also Like" movies={recommendations} />
       </div>

@@ -65,26 +65,38 @@ function PersonPageSkeleton() {
   );
 }
 
+// Simple in-memory cache
+const cache = new Map<string, any>();
+
 
 export default function PersonPage() {
   const params = useParams();
   const id = params.id as string;
-  const [person, setPerson] = useState<PersonDetails | null>(null);
-  const [credits, setCredits] = useState<PersonCombinedCredits | null>(null);
-  const [images, setImages] = useState<PersonImages | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [person, setPerson] = useState<PersonDetails | null>(() => cache.get(`person_${id}_details`));
+  const [credits, setCredits] = useState<PersonCombinedCredits | null>(() => cache.get(`person_${id}_credits`));
+  const [images, setImages] = useState<PersonImages | null>(() => cache.get(`person_${id}_images`));
+  const [loading, setLoading] = useState(!person);
 
   useEffect(() => {
     async function fetchData() {
       if (!id) return;
+      if (cache.has(`person_${id}_details`)) {
+        return;
+      }
       try {
         setLoading(true);
         const personData = await getPersonDetails(id);
         setPerson(personData);
+        cache.set(`person_${id}_details`, personData);
+
         const creditsData = await getPersonCombinedCredits(id);
         setCredits(creditsData);
+        cache.set(`person_${id}_credits`, creditsData);
+
         const imagesData = await getPersonImages(id);
         setImages(imagesData);
+        cache.set(`person_${id}_images`, imagesData);
+
       } catch (error) {
         console.error("Failed to fetch person data:", error);
       } finally {

@@ -29,7 +29,7 @@ export function CastCarousel({ cast }: CastCarouselProps) {
             <CarouselItem key={member.id} className="basis-1/3 pl-4 sm:basis-1/4 md:basis-1/5 lg:basis-1/6 xl:basis-1/8 2xl:basis-[12.5%]">
               <Link href={`/person/${member.id}`} className="group block">
                 <div className="flex flex-col items-center text-center">
-                  <Card className="overflow-hidden rounded-full border-2 border-transparent transition-colors w-32 h-32 md:w-40 md:h-40 group-hover:border-primary">
+                  <Card className="overflow-hidden rounded-full border-2 border-transparent transition-colors w-32 h-32 md:w-44 md:h-44 group-hover:border-primary">
                     <CardContent className="p-0 h-full w-full">
                       <div className="relative h-full w-full">
                         {member.profile_path ? (

@@ -9,6 +9,11 @@ import {
   getAnimatedShows,
   getTopRatedMovies,
   getMediaByProvider,
+  getActionMovies,
+  getComedyMovies,
+  getHorrorMovies,
+  getThrillerMovies,
+  getSciFiFantasyMovies,
 } from './tmdb';
 import type { Media, PaginatedResponse } from './types';
 
@@ -115,6 +120,41 @@ const discoverCategories: Record<string, DiscoverCategory> = {
       };
     }
   },
+  'action-movies': {
+    title: 'Action Movies',
+    fetcher: async (page: number) => {
+      const movies = await getActionMovies(page);
+      return { ...movies, results: movies.results.map(m => ({...m, media_type: 'movie'})) };
+    }
+  },
+  'comedy-movies': {
+    title: 'Comedy Movies',
+    fetcher: async (page: number) => {
+      const movies = await getComedyMovies(page);
+      return { ...movies, results: movies.results.map(m => ({...m, media_type: 'movie'})) };
+    }
+  },
+  'horror-movies': {
+    title: 'Horror Movies',
+    fetcher: async (page: number) => {
+      const movies = await getHorrorMovies(page);
+      return { ...movies, results: movies.results.map(m => ({...m, media_type: 'movie'})) };
+    }
+  },
+  'thriller-movies': {
+    title: 'Thrillers',
+    fetcher: async (page: number) => {
+      const movies = await getThrillerMovies(page);
+      return { ...movies, results: movies.results.map(m => ({...m, media_type: 'movie'})) };
+    }
+  },
+  'sci-fi-fantasy': {
+    title: 'Sci-Fi & Fantasy',
+    fetcher: async (page: number) => {
+      const movies = await getSciFiFantasyMovies(page);
+      return { ...movies, results: movies.results.map(m => ({...m, media_type: 'movie'})) };
+    }
+  }
 };
 
 Object.keys(services).forEach(serviceId => {

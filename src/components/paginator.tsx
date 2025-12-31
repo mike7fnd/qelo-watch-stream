@@ -21,7 +21,7 @@ export function Paginator({ currentPage, totalPages }: PaginatorProps) {
     params.set('page', pageNumber.toString());
     return `${pathname}?${params.toString()}`;
   };
-
+  
   const handlePageClick = (page: number | string) => {
     if (typeof page === 'number') {
       router.push(createPageURL(page));

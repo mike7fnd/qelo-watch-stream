@@ -28,7 +28,7 @@ export function MoviesByService({ initialMovies }: MoviesByServiceProps) {
   const searchParams = useSearchParams();
   const pageFromUrl = searchParams.get('page');
   const initialPage = pageFromUrl ? Number(pageFromUrl) : 1;
-
+  
   const [activeTab, setActiveTab] = useState('popular');
   const [movies, setMovies] = useState<Media[]>(initialMovies.results);
   const [loading, setLoading] = useState(false);
@@ -47,7 +47,7 @@ export function MoviesByService({ initialMovies }: MoviesByServiceProps) {
     if (currentPage === 1 && activeTab === 'popular' && movies === initialMovies.results) {
         return;
     }
-
+    
     setLoading(true);
     let promise;
     if (activeTab === 'popular') {
@@ -64,7 +64,7 @@ export function MoviesByService({ initialMovies }: MoviesByServiceProps) {
         setLoading(false);
     });
   }, [activeTab, currentPage, initialMovies.results]);
-
+  
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     setCurrentPage(1); // Reset to first page on tab change
@@ -77,7 +77,7 @@ export function MoviesByService({ initialMovies }: MoviesByServiceProps) {
           <TabsTrigger key={service.id} value={service.id}>{service.name}</TabsTrigger>
         ))}
       </TabsList>
-
+      
         {loading ? (
           <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
             {Array.from({ length: 20 }).map((_, i) => (
@@ -94,8 +94,8 @@ export function MoviesByService({ initialMovies }: MoviesByServiceProps) {
               ))}
             </div>
             {movies.length > 0 && totalPages > 1 && (
-                <Paginator
-                    currentPage={currentPage}
+                <Paginator 
+                    currentPage={currentPage} 
                     totalPages={totalPages}
                 />
             )}

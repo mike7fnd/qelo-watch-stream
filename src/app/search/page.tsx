@@ -15,14 +15,19 @@ import { Paginator } from '@/components/paginator';
 
 const MAX_HISTORY = 8;
 
+// Simple in-memory cache
+const cache = new Map<string, any>();
+
 function SearchResults() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get('query');
   const page = searchParams.get('page') ? Number(searchParams.get('page')) : 1;
-  const [results, setResults] = useState<Media[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [totalPages, setTotalPages] = useState(1);
+  const cacheKey = `search_${query}_${page}`;
+  
+  const [results, setResults] = useState<Media[]>(() => cache.get(cacheKey)?.results || []);
+  const [loading, setLoading] = useState(!cache.has(cacheKey));
+  const [totalPages, setTotalPages] = useState(() => cache.get(cacheKey)?.totalPages || 1);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   useEffect(() => {
@@ -36,6 +41,14 @@ function SearchResults() {
 
   useEffect(() => {
     if (query) {
+      if (cache.has(cacheKey)) {
+        const cached = cache.get(cacheKey);
+        setResults(cached.results);
+        setTotalPages(cached.totalPages);
+        setLoading(false);
+        return;
+      }
+      
       setLoading(true);
 
       try {
@@ -54,8 +67,13 @@ function SearchResults() {
       ]).then(([movies, tvShows]) => {
         const movieResults = movies.results.map(m => ({...m, media_type: 'movie' as const}));
         const tvShowResults = tvShows.results.map(t => ({...t, media_type: 'tv' as const}));
-        setResults([...movieResults, ...tvShowResults].sort((a, b) => b.popularity - a.popularity));
-        setTotalPages(Math.max(movies.total_pages, tvShows.total_pages));
+        const combinedResults = [...movieResults, ...tvShowResults].sort((a, b) => b.popularity - a.popularity);
+        const combinedTotalPages = Math.max(movies.total_pages, tvShows.total_pages);
+        
+        setResults(combinedResults);
+        setTotalPages(combinedTotalPages);
+        cache.set(cacheKey, { results: combinedResults, totalPages: combinedTotalPages });
+
       }).finally(() => {
         setLoading(false);
       });
@@ -63,7 +81,7 @@ function SearchResults() {
       setResults([]);
       setLoading(false);
     }
-  }, [query, page]);
+  }, [query, page, cacheKey]);
 
   const handleHistoryClick = (item: string) => {
     router.push(`/search?query=${encodeURIComponent(item)}`);

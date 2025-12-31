@@ -4,24 +4,38 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Info, PlayCircle, Plus, Check, Star } from 'lucide-react';
-import type { Media } from '@/lib/types';
-import { getImageUrl, getMediaImages } from '@/lib/tmdb';
+import { Info, PlayCircle, Plus, Check } from 'lucide-react';
+import type { Media, MediaDetails } from '@/lib/types';
+import { getImageUrl, getMediaImages, getMovieDetails, getTvShowDetails } from '@/lib/tmdb';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
-import { StarRating } from './star-rating';
 import { useMyList } from '@/hooks/use-my-list';
 import Autoplay from "embla-carousel-autoplay";
 import { cn } from '@/lib/utils';
 
-interface HeroProps {
-  movies: Media[];
+const STREAMING_SERVICE_IDS = [8, 337, 9, 1899, 2552, 453]; // Netflix, Disney+, Prime Video, Max, Apple TV+, Hulu
+
+function formatRuntime(media: MediaDetails) {
+  if (media.media_type === 'movie' && media.runtime) {
+    const hours = Math.floor(media.runtime / 60);
+    const mins = media.runtime % 60;
+    return `${hours}h ${mins}m`;
+  }
+  if (media.media_type === 'tv' && media.episode_run_time && media.episode_run_time.length > 0) {
+    const avgMinutes = media.episode_run_time.reduce((a, b) => a + b, 0) / media.episode_run_time.length;
+    if (avgMinutes < 60) return `${Math.round(avgMinutes)}m/ep`;
+    const hours = Math.floor(avgMinutes / 60);
+    const mins = Math.round(avgMinutes % 60);
+    return `${hours}h ${mins}m/ep`;
+  }
+  return null;
 }
 
 export function Hero({ movies }: HeroProps) {
   const { addToList, removeFromList, isInList } = useMyList();
   const [api, setApi] = React.useState<CarouselApi>()
   const [current, setCurrent] = React.useState(0)
+  const [details, setDetails] = React.useState<Record<number, MediaDetails | null>>({});
   const [logos, setLogos] = React.useState<Record<number, string | null>>({});
   const autoplay = React.useRef(
     Autoplay({
@@ -43,28 +57,41 @@ export function Hero({ movies }: HeroProps) {
   }, [api])
 
   React.useEffect(() => {
-    const fetchLogos = async () => {
-      const logoPromises = movies.map(async (movie) => {
+    const fetchDetailsAndLogos = async () => {
+      const detailPromises = movies.map(async (movie) => {
         try {
+          const detail = movie.media_type === 'movie'
+            ? await getMovieDetails(movie.id)
+            : await getTvShowDetails(movie.id);
+
           const images = await getMediaImages(movie.id, movie.media_type);
           const englishLogo = images.logos.find(l => l.iso_639_1 === 'en');
           const logoPath = englishLogo?.file_path || (images.logos.length > 0 ? images.logos[0].file_path : null);
-          return { id: movie.id, logo: logoPath ? getImageUrl(logoPath, 'w500') : null };
+          const logoUrl = logoPath ? getImageUrl(logoPath, 'w500') : null;
+          
+          return { id: movie.id, detail: { ...detail, media_type: movie.media_type }, logo: logoUrl };
         } catch (error) {
-          console.error(`Failed to fetch logo for ${movie.id}:`, error);
-          return { id: movie.id, logo: null };
+          console.error(`Failed to fetch details for ${movie.id}:`, error);
+          return { id: movie.id, detail: null, logo: null };
         }
       });
-      const logoResults = await Promise.all(logoPromises);
-      const logosMap = logoResults.reduce((acc, { id, logo }) => {
+
+      const results = await Promise.all(detailPromises);
+      const detailsMap = results.reduce((acc, { id, detail }) => {
+        acc[id] = detail;
+        return acc;
+      }, {} as Record<number, MediaDetails | null>);
+      const logosMap = results.reduce((acc, { id, logo }) => {
         acc[id] = logo;
         return acc;
       }, {} as Record<number, string | null>);
+
+      setDetails(detailsMap);
       setLogos(logosMap);
     };
 
     if (movies.length > 0) {
-      fetchLogos();
+      fetchDetailsAndLogos();
     }
   }, [movies]);
 
@@ -84,6 +111,14 @@ export function Hero({ movies }: HeroProps) {
           {movies.map((movie) => {
             const title = getTitle(movie);
             const releaseDate = getReleaseDate(movie);
+            const detail = details[movie.id];
+            const runtime = detail ? formatRuntime(detail) : null;
+            const genre = detail?.genres?.[0]?.name;
+
+            const streamingService = detail?.media_type === 'movie'
+              ? detail.production_companies.find(c => STREAMING_SERVICE_IDS.includes(c.id)) || detail.production_companies.find(c => c.logo_path)
+              : (detail as any)?.networks?.find((n: any) => STREAMING_SERVICE_IDS.includes(n.id)) || (detail as any)?.networks?.[0];
+
             const inList = isInList(movie.id);
 
             const handleToggleList = (e: React.MouseEvent) => {
@@ -126,9 +161,33 @@ export function Hero({ movies }: HeroProps) {
                             ) : (
                               <h1 className="font-headline text-4xl font-semibold md:text-7xl text-shadow-lg">{title}</h1>
                             )}
-                            <div className="flex items-center gap-4 text-sm md:text-base">
-                                <StarRating rating={movie.vote_average} className="text-white"/>
-                                {releaseDate && <span>{releaseDate.substring(0, 4)}</span>}
+                            <div className="flex items-center gap-4 text-sm md:text-base text-white/90">
+                                {genre && <span>{genre}</span>}
+                                {releaseDate && (
+                                  <>
+                                    <div className="h-4 w-px bg-white/30" />
+                                    <span>{releaseDate.substring(0, 4)}</span>
+                                  </>
+                                )}
+                                {runtime && (
+                                  <>
+                                    <div className="h-4 w-px bg-white/30" />
+                                    <span>{runtime}</span>
+                                  </>
+                                )}
+                                {streamingService?.logo_path && (
+                                    <>
+                                      <div className="h-4 w-px bg-white/30" />
+                                      <div className="relative h-4 w-12">
+                                        <Image
+                                          src={getImageUrl(streamingService.logo_path, 'w300')}
+                                          alt={streamingService.name}
+                                          fill
+                                          className="object-contain object-left invert brightness-0"
+                                        />
+                                      </div>
+                                    </>
+                                )}
                             </div>
                             <p className="text-sm text-white/80 line-clamp-3 md:text-base text-shadow-md">
                                 {movie.overview}
@@ -150,9 +209,19 @@ export function Hero({ movies }: HeroProps) {
                               <p className="font-semibold text-2xl text-shadow-lg">{title}</p>
                             )}
                              <div className="flex items-center gap-2 text-xs">
-                                <span className="capitalize">{movie.media_type}</span>
-                                {releaseDate && <span>&bull; {releaseDate.substring(0, 4)}</span>}
-                                {movie.vote_average > 0 && <span>&bull; {(movie.vote_average / 2).toFixed(1)} <Star className="inline h-3 w-3 fill-yellow-400 text-yellow-400" /></span>}
+                                {genre && <span>{genre}</span>}
+                                {releaseDate && (
+                                    <>
+                                        <span className="mx-1">|</span>
+                                        <span>{releaseDate.substring(0, 4)}</span>
+                                    </>
+                                )}
+                                {runtime && (
+                                    <>
+                                        <span className="mx-1">|</span>
+                                        <span>{runtime}</span>
+                                    </>
+                                )}
                             </div>
                         </div>
 
@@ -219,3 +288,5 @@ export function Hero({ movies }: HeroProps) {
     </div>
   );
 }
+
+    

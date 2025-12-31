@@ -32,6 +32,15 @@ async function fetchFromTMDB<T>(endpoint: string, params: Record<string, string>
   }
 }
 
+const GENRE_IDS = {
+  ACTION: '28',
+  COMEDY: '35',
+  HORROR: '27',
+  THRILLER: '53',
+  SCIFI: '878',
+  FANTASY: '14',
+};
+
 // Movies
 export const getNowPlayingMovies = (page: number = 1) => fetchFromTMDB<PaginatedResponse<Movie>>('movie/now_playing', { page: String(page) });
 export const getPopularMovies = (page: number = 1) => fetchFromTMDB<PaginatedResponse<Movie>>('movie/popular', { page: String(page) });
@@ -46,6 +55,12 @@ export const getMovieVideos = async (id: string | number): Promise<Video[]> => {
 export const getMovieCredits = (id: string | number) => fetchFromTMDB<Credits>(`movie/${id}/credits`);
 export const searchMovies = (query: string, page: number = 1) => fetchFromTMDB<PaginatedResponse<Movie>>('search/movie', { query, page: String(page) });
 export const getMovieRecommendations = (id: string | number, page: number = 1) => fetchFromTMDB<PaginatedResponse<Movie>>(`movie/${id}/recommendations`, { page: String(page) });
+export const getActionMovies = (page: number = 1) => fetchFromTMDB<PaginatedResponse<Movie>>('discover/movie', { with_genres: GENRE_IDS.ACTION, sort_by: 'popularity.desc', page: String(page) });
+export const getComedyMovies = (page: number = 1) => fetchFromTMDB<PaginatedResponse<Movie>>('discover/movie', { with_genres: GENRE_IDS.COMEDY, sort_by: 'popularity.desc', page: String(page) });
+export const getHorrorMovies = (page: number = 1) => fetchFromTMDB<PaginatedResponse<Movie>>('discover/movie', { with_genres: GENRE_IDS.HORROR, sort_by: 'popularity.desc', page: String(page) });
+export const getThrillerMovies = (page: number = 1) => fetchFromTMDB<PaginatedResponse<Movie>>('discover/movie', { with_genres: GENRE_IDS.THRILLER, sort_by: 'popularity.desc', page: String(page) });
+export const getSciFiFantasyMovies = (page: number = 1) => fetchFromTMDB<PaginatedResponse<Movie>>('discover/movie', { with_genres: `${GENRE_IDS.SCIFI},${GENRE_IDS.FANTASY}`, sort_by: 'popularity.desc', page: String(page) });
+
 
 
 // TV Shows

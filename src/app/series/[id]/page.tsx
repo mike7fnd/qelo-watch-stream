@@ -29,36 +29,49 @@ function formatRuntime(minutes: number[] | null) {
 
 const STREAMING_SERVICE_IDS = [8, 337, 9, 1899, 2552, 453, 56];
 
+// Simple in-memory cache
+const cache = new Map<string, any>();
+
 export default function TVShowDetailPage() {
   const params = useParams();
   const id = params.id as string;
-  const [showDetails, setShowDetails] = React.useState<TVShowDetails | null>(null);
-  const [videos, setVideos] = React.useState<Video[]>([]);
-  const [credits, setCredits] = React.useState<Credits | null>(null);
-  const [logoUrl, setLogoUrl] = React.useState<string | null>(null);
-  const [recommendations, setRecommendations] = React.useState<Media[]>([]);
+  const [showDetails, setShowDetails] = React.useState<TVShowDetails | null>(() => cache.get(`show_${id}_details`));
+  const [videos, setVideos] = React.useState<Video[]>(() => cache.get(`show_${id}_videos`) || []);
+  const [credits, setCredits] = React.useState<Credits | null>(() => cache.get(`show_${id}_credits`));
+  const [logoUrl, setLogoUrl] = React.useState<string | null>(() => cache.get(`show_${id}_logo`));
+  const [recommendations, setRecommendations] = React.useState<Media[]>(() => cache.get(`show_${id}_recommendations`) || []);
   const { addToList, removeFromList, isInList } = useMyList();
 
   React.useEffect(() => {
     const fetchData = async () => {
       if (!id) return;
+      if (cache.has(`show_${id}_details`)) {
+        return;
+      }
       try {
         const details = await getTvShowDetails(id);
         setShowDetails(details);
+        cache.set(`show_${id}_details`, details);
 
         const videoData = await getTvShowVideos(id);
         setVideos(videoData);
+        cache.set(`show_${id}_videos`, videoData);
 
         const creditData = await getTvShowCredits(id);
         setCredits(creditData);
+        cache.set(`show_${id}_credits`, creditData);
 
         const imageData = await getMediaImages(id, 'tv');
         const englishLogo = imageData.logos.find(l => l.iso_639_1 === 'en');
         const logoPath = englishLogo?.file_path || (imageData.logos.length > 0 ? imageData.logos[0].file_path : null);
-        setLogoUrl(logoPath ? getImageUrl(logoPath, 'w500') : null);
+        const newLogoUrl = logoPath ? getImageUrl(logoPath, 'w500') : null;
+        setLogoUrl(newLogoUrl);
+        cache.set(`show_${id}_logo`, newLogoUrl);
 
         const recommendationsData = await getTvShowRecommendations(id);
-        setRecommendations(recommendationsData.results.map(m => ({ ...m, media_type: 'tv' })));
+        const recs = recommendationsData.results.map(m => ({ ...m, media_type: 'tv' as const }));
+        setRecommendations(recs);
+        cache.set(`show_${id}_recommendations`, recs);
 
       } catch (error) {
         console.error("Failed to fetch show data:", error);
@@ -242,7 +255,7 @@ export default function TVShowDetailPage() {
         </div>
       </div>
 
-      <div className="container max-w-screen-2xl py-12 space-y-12">
+      <div className="container max-w-screen-2xl pt-6 pb-12 md:py-12 space-y-12">
         <CastCarousel cast={credits.cast} />
         <SeasonSelector showId={showDetails.id} seasons={showDetails.seasons} />
         <MovieCarousel title="You May Also Like" movies={recommendations} />
