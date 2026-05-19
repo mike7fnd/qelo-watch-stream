@@ -4,6 +4,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { MyListProvider } from '@/hooks/use-my-list';
 import { Header } from '@/components/header';
+import { AdminOverlay } from '@/components/admin-overlay';
 
 export const metadata: Metadata = {
   title: 'Qelo',
@@ -27,6 +28,7 @@ export default function RootLayout({
           <Header />
           <main className="flex-1 overflow-x-hidden pb-20 md:pb-0">{children}</main>
           <Toaster />
+          <AdminOverlay />
         </MyListProvider>
       </body>
     </html>
